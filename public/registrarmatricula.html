@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar Matrícula - Universidad Leonesco</title>
+  <style>
+    :root {
+      --naranja: #f26c18;
+      --marron: #5a3e1b;
+      --fondo: #fdf6f0;
+      --gris: #999999;
+      --texto: #333333;
+      --blanco: #ffffff;
+      --amarillo: #ffd700;
+      --verde: #28a745;
+      --rojo: #dc3545;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--fondo); display: flex; position: relative; }
+    .sidebar { width: 240px; background-color: var(--blanco); height: 100vh; position: fixed; top: 0; left: 0; box-shadow: 2px 0 5px rgba(0,0,0,0.1); overflow-y: auto; z-index: 1; }
+    .sidebar-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 5; display: none; }
+    .sidebar-header { position: relative; height: 160px; background: url('fondo.png') no-repeat center center; background-size: cover; }
+    .sidebar-header::after { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); }
+    .sidebar-header-content { position: relative; z-index: 1; text-align: center; padding-top: 20px; }
+    .sidebar-header-content a img { width: 80px; border-radius: 50%; border: 3px solid white; margin-bottom: 10px; cursor: pointer; }
+    .sidebar-header-content h3 { color: white; margin: 0; font-size: 14px; }
+    .sidebar ul { list-style: none; padding: 0; margin: 0; }
+    .sidebar ul li { padding: 15px 20px; border-bottom: 1px solid var(--gris); cursor: pointer; color: var(--texto); display: flex; justify-content: space-between; align-items: center; }
+    .sidebar ul li:hover { background-color: var(--fondo); }
+    .submenu { display: none; padding-left: 20px; background-color: #fdf6f0; }
+    .submenu li { border: none; padding: 10px 20px; }
+
+    .main { flex: 1; margin-left: 240px; position: relative; z-index: 0; }
+    .topbar { background-color: var(--naranja); height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+    .topbar h1 { font-size: 20px; color: white; margin: 0; }
+    .content { padding: 30px; min-height: calc(100vh - 60px); display: flex; justify-content: center; align-items: center; position: relative; }
+    .main-overlay { position: fixed; top: 0; left: 240px; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 5; display: none; }
+
+    .modal-content { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.5); width: 700px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 11; display: none; max-height: 90vh; overflow-y: auto; }
+    .close { position: absolute; top: 15px; right: 20px; font-size: 28px; font-weight: bold; color: var(--gris); cursor: pointer; }
+    h2 { color: var(--marron); margin-top: 0; }
+    select { width: 100%; padding: 10px; font-size: 16px; margin-bottom: 20px; }
+    .mensaje { font-weight: bold; margin: 10px 0; display: flex; align-items: center; }
+    .mensaje span { margin-left: 10px; }
+    .verde { color: var(--verde); }
+    .rojo { color: var(--rojo); }
+    .btn-siguiente { padding: 10px 20px; background: #1a73e8; color: white; border: none; border-radius: 5px; cursor: pointer; display: none; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
+    th { background-color: var(--amarillo); color: var(--marron); }
+    .contador { margin-top: 15px; font-weight: bold; }
+.boton-continuar {
+  background-color: #1a73e8;
+  color: white;
+  padding: 10px 25px;
+  font-weight: bold;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background 0.3s;
+}
+
+.boton-continuar:hover {
+  background-color: #1669c1;
+}
+
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="sidebar-header">
+    <div class="sidebar-header-content">
+      <a href="pantallaprinci.html"><img src="leonescologo.png" alt="Logo"></a>
+      <h3>UNIVERSIDAD LEONESCO</h3>
+    </div>
+  </div>
+<ul>
+  <li onclick="toggleSubMenu('matriculaSubmenu', 'arrowMatricula')"> Matrículas <span id="arrowMatricula">▼</span></li>
+  <ul class="submenu" id="matriculaSubmenu">
+    <li><a href="simulacionrealnofake.html" style="text-decoration: none; color: inherit;">Simulación de Matrícula</a></li>
+    <li><a href="registrarmatricula.html" style="text-decoration: none; color: inherit;">Registrar Matrícula</a></li>
+    <li><a href="fechasmatricula.html" style="text-decoration: none; color: inherit;">Fechas de mi Matrícula</a></li>
+  </ul>
+
+    <li onclick="toggleSubMenu('academicoSubmenu', 'arrowAcademico')"> Información Académica <span id="arrowAcademico">▼</span></li>
+    <ul class="submenu" id="academicoSubmenu">
+    <li><a href="consolidadomtr.html" style="text-decoration: none; color: inherit;">Consolidado de Matrícula</a></li>
+    <li><a href="consolidadont.html" style="text-decoration: none; color: inherit;">Consolidado de Notas</a></li>
+    <li><a href="horario.html" style="text-decoration: none; color: inherit;">Mi Horario</a></li>
+    <li><a href="fichaaca.html" style="text-decoration: none; color: inherit;">Ficha Académica</a></li>
+    </ul>
+  <li><a href="infpersonal.html" style="text-decoration: none; color: inherit;">Información Personal</a></li>
+  <li><a href="preguntas.html" style="text-decoration: none; color: inherit;">Preguntas Frecuentes</a></li>
+  <li><a href="pantallainicio.html" style="text-decoration: none; color: inherit;">Salir</a></li>
+  </ul>
+</div>
+
+<div class="main">
+  <div class="main-overlay" id="mainOverlay"></div>
+  <div class="topbar">
+    <h1>Registrar Matrícula</h1>
+  </div>
+  <div class="content">
+
+    <!-- Primer Modal -->
+    <div class="modal-content" id="modal">
+      <div class="close" onclick="cerrarModal()">×</div>
+      <h2>Escuela Profesional:</h2>
+      <select id="escuelaSelect" onchange="validarSeleccion()">
+        <option value="">Seleccione su escuela profesional...</option>
+        <option value="idiomas">2021913661 - CENTRO DE IDIOMAS - JUNIO 2° QUINCENA - 2025</option>
+        <option value="sistemas">2023223291 - INGENIERÍA DE SISTEMAS - Semestre Impar 2025</option>
+      </select>
+      <div class="mensajes" id="mensajes"></div>
+      <button class="btn-siguiente" id="btnSiguiente" onclick="mostrarCursos()">SIGUIENTE</button>
+    </div>
+
+<!-- Segundo Modal - Cursos -->
+<div class="modal-content" id="modalCursos" style="display:none;">
+  <div class="close" onclick="cerrarModal()">×</div>
+  <h2 style="color: var(--marron); margin-bottom: 20px;">Marque los cursos:</h2>
+
+  <table style="width: 100%; border-collapse: collapse;">
+    <thead>
+      <tr style="background-color: var(--amarillo); color: var(--marron);">
+        <th></th>
+        <th style="text-align:left;">Curso</th>
+        <th>Vez</th>
+        <th>C.Teo</th>
+        <th>C.Pra</th>
+        <th>Sem.</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background-color: #fff8ef;">
+        <td><input type="checkbox" data-creditos="4" onchange="actualizarContador()"></td>
+        <td style="text-align:left;">GA</td><td>1</td><td>3</td><td>1</td><td>5</td>
+      </tr>
+      <tr style="background-color: #fff8ef;">
+        <td><input type="checkbox" data-creditos="5" onchange="actualizarContador()"></td>
+        <td style="text-align:left;">TENGO MEYO</td><td>1</td><td>4</td><td>0</td><td>5</td>
+      </tr>
+    </tbody>
+  </table>
+
+<div style="margin-top: 20px;">
+  Nro. Cursos: <span style="color:#1a73e8;" id="totalCursos">0</span> - Créditos: <span style="color:#1a73e8;" id="totalCreditos">0</span>
+</div>
+
+
+  <div style="margin-top: 10px;">
+    Click en CONTINUAR para seleccionar horarios.
+  </div>
+
+<button class="boton-continuar" onclick="mostrarHorario()">CONTINUAR</button>
+
+
+</div>
+<div id="vistaHorario" style="display:none; width:100%;">
+  <div style="display: flex; gap: 20px;">
+
+    <!-- Vista Previa Horario -->
+    <div style="flex: 2; border: 2px solid #e26b00; background-color: #dff4ff;">
+      <div style="background-color: #e26b00; color: white; padding: 10px; font-weight: bold;">Vista Previa Horario</div>
+      <div style="text-align: center; padding: 200px; color: grey; font-style: italic;">(Calendario)</div>
+    </div>
+
+    <!-- Panel derecho -->
+    <div style="flex: 1; border: 2px solid #ffd700; background-color: #fff8ef; display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <div style="background-color: #ffd700; color: #5a3e1b; font-weight: bold; padding: 10px;">Cursos Seleccionados</div>
+        <div style="padding: 20px;">
+          <select id="cursosSeleccionados" style="width: 100%; padding: 10px; background-color: #ffd700; border: none; border-radius: 5px; font-weight: bold;">
+            <option>TENGO MEYO</option>
+          </select>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding: 20px;">
+        <button style="background-color: #e26b00; color: white; padding: 10px 20px; font-weight: bold; border-radius: 5px;">MATRICULARSE</button>
+        <button style="background-color: #ffd700; color: black; padding: 10px 20px; font-weight: bold; border-radius: 5px;">LIMPIAR</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+
+<script>
+function toggleSubMenu(submenuId, arrowId) {
+  const submenu = document.getElementById(submenuId);
+  const arrow = document.getElementById(arrowId);
+  submenu.style.display = submenu.style.display === "block" ? "none" : "block";
+  arrow.textContent = submenu.style.display === "block" ? "▲" : "▼";
+}
+
+function validarSeleccion() {
+  const valor = document.getElementById('escuelaSelect').value;
+  const mensajes = document.getElementById('mensajes');
+  const btn = document.getElementById('btnSiguiente');
+  mensajes.innerHTML = "";
+  btn.style.display = "none";
+
+  if(valor === "idiomas") {
+    mensajes.innerHTML += '<div class="mensaje verde">✔ <span>Pago encontrado correctamente.</span></div>';
+    mensajes.innerHTML += '<div class="mensaje verde">✔ <span>Dentro de las fechas de matrícula.</span></div>';
+    btn.style.display = "inline-block";
+  } else if(valor === "sistemas") {
+    mensajes.innerHTML += '<div class="mensaje rojo">✖ <span>No se encontró el pago.</span></div>';
+    mensajes.innerHTML += '<div class="mensaje rojo">✖ <span>No se encuentra dentro de las fechas de matrícula.</span></div>';
+  }
+}
+
+function abrirModal() {
+  document.getElementById("modal").style.display = "block";
+  document.getElementById("sidebarOverlay").style.display = "block";
+  document.getElementById("mainOverlay").style.display = "block";
+}
+
+function cerrarModal() {
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("modalCursos").style.display = "none";
+  document.getElementById("sidebarOverlay").style.display = "none";
+  document.getElementById("mainOverlay").style.display = "none";
+}
+
+function mostrarCursos() {
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("modalCursos").style.display = "block";
+}
+
+function actualizarContador() {
+  let totalCursos = 0;
+  let totalCreditos = 0;
+
+  document.querySelectorAll("tbody input[type=checkbox]").forEach(cb => {
+    if (cb.checked) {
+      totalCursos++;
+      totalCreditos += parseInt(cb.closest('tr').querySelector('td:nth-child(4)').innerText) 
+                     + parseInt(cb.closest('tr').querySelector('td:nth-child(5)').innerText);
+    }
+  });
+
+  document.getElementById("totalCursos").innerText = totalCursos;
+  document.getElementById("totalCreditos").innerText = totalCreditos;
+}
+
+function mostrarHorario() {
+  document.getElementById("modalCursos").style.display = "none";
+  document.getElementById("vistaHorario").style.display = "block";
+  document.getElementById("mainOverlay").style.display = "none";
+  document.getElementById("sidebarOverlay").style.display = "none"; 
+}
+
+window.onload = abrirModal;
+</script>
+
+</body>
+</html>

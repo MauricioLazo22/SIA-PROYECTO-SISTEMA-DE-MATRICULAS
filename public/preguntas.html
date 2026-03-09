@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Preguntas Frecuentes - Universidad Leonesco</title>
+  <style>
+    :root {
+      --naranja: #f26c18;
+      --marron: #5a3e1b;
+      --fondo: #fdf6f0;
+      --gris: #999999;
+      --texto: #333333;
+      --blanco: #ffffff;
+      --amarillo: #ffd700;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--fondo); display: flex; }
+    .sidebar { width: 240px; background-color: var(--blanco); height: 100vh; position: fixed; top: 0; left: 0; box-shadow: 2px 0 5px rgba(0,0,0,0.1); overflow-y: auto; }
+    .sidebar-header { position: relative; height: 160px; background: url('fondo.png') no-repeat center center; background-size: cover; }
+    .sidebar-header::after { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); }
+    .sidebar-header-content { position: relative; z-index: 1; text-align: center; padding-top: 20px; }
+    .sidebar-header-content img { width: 80px; border-radius: 50%; border: 3px solid white; margin-bottom: 10px; cursor: pointer; }
+    .sidebar-header-content h3 { color: white; margin: 0; font-size: 14px; }
+    .sidebar ul { list-style: none; padding: 0; margin: 0; }
+    .sidebar ul li { padding: 15px 20px; border-bottom: 1px solid var(--gris); cursor: pointer; color: var(--texto); display: flex; justify-content: space-between; align-items: center; }
+    .sidebar ul li:hover { background-color: var(--fondo); }
+    .submenu { display: none; padding-left: 20px; background-color: #fdf6f0; }
+    .submenu li { border: none; padding: 10px 20px; }
+    .main { flex: 1; margin-left: 240px; }
+    .topbar { background-color: var(--naranja); height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: relative; }
+    .topbar h1 { font-size: 20px; color: white; margin: 0; }
+    .avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid white; cursor: pointer; }
+    .dropdown { position: absolute; top: 60px; right: 20px; background-color: white; border: 1px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.3); border-radius: 4px; display: none; z-index: 100; }
+    .dropdown div { padding: 10px 20px; cursor: pointer; }
+    .dropdown div:hover { background-color: #eee; }
+    .content { padding: 30px; background-color: #e0e0e0; min-height: calc(100vh - 60px); }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-header-content">
+        <a href="pantallaprinci.html"><img src="leonescologo.png" alt="Logo Leonesco"></a>
+        <h3>UNIVERSIDAD LEONESCO</h3>
+      </div>
+    </div>
+
+    <ul>
+      <li onclick="toggleSubMenu('matriculaSubmenu', 'arrowMatricula')">
+        Matrículas <span id="arrowMatricula">▼</span>
+      </li>
+      <ul class="submenu" id="matriculaSubmenu">
+        <li><a href="simulacionrealnofake.html" style="text-decoration: none; color: inherit;">Simulación de Matrícula</a></li>
+        <li><a href="registrarmatricula.html" style="text-decoration: none; color: inherit;">Registrar Matrícula</a></li>
+        <li><a href="fechasmatricula.html" style="text-decoration: none; color: inherit;">Fechas de mi Matrícula</a></li>
+      </ul>
+
+      <li onclick="toggleSubMenu('academicoSubmenu', 'arrowAcademico')">
+        Información Académica <span id="arrowAcademico">▼</span>
+      </li>
+      <ul class="submenu" id="academicoSubmenu">
+        <li><a href="consolidadomtr.html" style="text-decoration: none; color: inherit;">Consolidado de Matrícula</a></li>
+        <li><a href="consolidadont.html" style="text-decoration: none; color: inherit;">Consolidado de Notas</a></li>
+        <li><a href="horario.html" style="text-decoration: none; color: inherit;">Mi Horario</a></li>
+        <li><a href="fichaaca.html" style="text-decoration: none; color: inherit;">Ficha Académica</a></li>
+      </ul>
+
+      <li><a href="infpersonal.html" style="text-decoration: none; color: inherit;">Información Personal</a></li>
+      <li><a href="preguntas.html" style="text-decoration: none; color: inherit;">Preguntas Frecuentes</a></li>
+      <li>Salir</li>
+    </ul>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <h1>Preguntas Frecuentes</h1>
+      <div style="position: relative;">
+        <img src="persona.png" alt="Usuario" class="avatar" onclick="toggleUserMenu()">
+        <div class="dropdown" id="userMenu">
+          <div onclick="location.href='infpersonal.html'">Información Personal</div>
+          <div onclick="alert('Sesión Cerrada');">Salir</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- CONTENIDO VACÍO POR AHORA -->
+    </div>
+  </div>
+
+<script>
+  function toggleSubMenu(submenuId, arrowId) {
+    const submenu = document.getElementById(submenuId);
+    const arrow = document.getElementById(arrowId);
+    if (submenu.style.display === "block") {
+      submenu.style.display = "none";
+      arrow.textContent = "▼";
+    } else {
+      submenu.style.display = "block";
+      arrow.textContent = "▲";
+    }
+  }
+  function toggleUserMenu() {
+    const menu = document.getElementById("userMenu");
+    menu.style.display = (menu.style.display === "block") ? "none" : "block";
+  }
+  document.addEventListener("click", function(e) {
+    if (!e.target.closest('.topbar')) {
+      document.getElementById("userMenu").style.display = "none";
+    }
+  });
+</script>
+
+</body>
+</html>
+

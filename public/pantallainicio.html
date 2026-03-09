@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Inicio de Sesión - Universidad Leonesco</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('fondo.png') no-repeat center center fixed;
+      background-size: cover;
+    }
+    .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 100vh;
+      backdrop-filter: blur(2px);
+    }
+    .left-panel {
+      width: 50%;
+      padding: 60px;
+      background: rgba(255, 255, 255, 0.85);
+      text-align: center;
+    }
+    .left-panel img {
+      width: 140px;
+      border-radius: 50%;
+      margin-bottom: 20px;
+      border: 3px solid #5a3e1b;
+    }
+    .left-panel h1 {
+      font-size: 26px;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+    .left-panel p {
+      font-size: 16px;
+      color: #333;
+    }
+    .right-panel {
+      width: 40%;
+      padding: 40px;
+      background: #fdf6f0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #999;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .forgot {
+      text-align: right;
+      font-size: 12px;
+      margin-top: -10px;
+      margin-bottom: 20px;
+    }
+    .forgot a {
+      text-decoration: none;
+      color: #555;
+    }
+    .login-btn {
+      padding: 10px;
+      background-color: #f26c18;
+      color: white;
+      border: none;
+      width: 100%;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .login-btn:hover {
+      background-color: #d95d10;
+    }
+    .error-message {
+      background-color: #ffe5e5;
+      color: #a20000;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ff9999;
+      border-radius: 4px;
+      text-align: center;
+      font-weight: bold;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Lado izquierdo -->
+    <div class="left-panel">
+      <img src="leonescologo.png" alt="Logo Leonesco">
+      <h1>UNIVERSIDAD LEONESCO</h1>
+      <p>SISTEMA DE MATRÍCULA</p>
+    </div>
+
+    <!-- Lado derecho -->
+    <div class="right-panel">
+      <div class="error-message" id="errorBox">
+        Usuario o contraseña incorrectos. Intenta nuevamente.
+      </div>
+      <div class="form-group">
+        <label for="usuario">Usuario:</label>
+        <input type="text" id="usuario" placeholder="Ingrese su usuario">
+      </div>
+      <div class="form-group">
+        <label for="clave">Contraseña:</label>
+        <input type="password" id="clave" placeholder="Ingrese su contraseña">
+      </div>
+      <div class="forgot">
+        <a href="recuperarcontr.html">¿Olvidaste tu contraseña?</a>
+      </div>
+      <button class="login-btn" onclick="validarLogin()">INGRESAR</button>
+    </div>
+  </div>
+
+
+  <script>
+    async function validarLogin() {
+      const usuario = document.getElementById('usuario').value.trim();
+      const clave = document.getElementById('clave').value.trim();
+      const errorBox = document.getElementById('errorBox');
+
+      try {
+        const response = await fetch('http://localhost:3000/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ correo: usuario, password: clave })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.message === "Inicio de sesión exitoso") {
+          // Opcional: almacenar datos del usuario
+          sessionStorage.setItem('usuario', JSON.stringify(data.usuario));
+          errorBox.style.display = "none";
+          window.location.href = "pantallaprinci.html";
+        } else {
+          throw new Error("Credenciales incorrectas");
+        }
+      } catch (error) {
+        errorBox.style.display = "block";
+      }
+    }
+  </script>
+</body>
+</html>

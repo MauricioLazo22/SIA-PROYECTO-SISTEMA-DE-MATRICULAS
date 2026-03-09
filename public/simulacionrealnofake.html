@@ -1,0 +1,444 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulación de Matrícula - Universidad Leonesco</title>
+  <style>
+    :root {
+      --naranja: #f26c18;
+      --marron: #5a3e1b;
+      --fondo: #fdf6f0;
+      --gris: #999999;
+      --texto: #333333;
+      --blanco: #ffffff;
+      --amarillo: #ffd700;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--fondo); display: flex; }
+    .sidebar { width: 240px; background-color: var(--blanco); height: 100vh; position: fixed; top: 0; left: 0; padding: 0; box-shadow: 2px 0 5px rgba(0,0,0,0.1); overflow-y: auto; }
+    .sidebar-header { position: relative; height: 160px; background: url('fondo.png') no-repeat center center; background-size: cover; }
+    .sidebar-header::after { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); }
+    .sidebar-header-content { position: relative; z-index: 1; text-align: center; padding-top: 20px; }
+    .sidebar-header-content img { width: 80px; border-radius: 50%; border: 3px solid white; margin-bottom: 10px; }
+    .sidebar-header-content h3 { color: white; margin: 0; font-size: 14px; }
+    .sidebar ul { list-style: none; padding: 0; margin: 0; }
+    .sidebar ul li { padding: 15px 20px; border-bottom: 1px solid var(--gris); cursor: pointer; color: var(--texto); display: flex; justify-content: space-between; align-items: center; }
+    .sidebar ul li:hover { background-color: var(--fondo); }
+    .submenu { display: none; padding-left: 20px; background-color: #fdf6f0; }
+    .submenu li { border: none; padding: 10px 20px; }
+    .main { flex: 1; margin-left: 240px; }
+    .topbar { background-color: var(--naranja); height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+    .topbar img.avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid white; cursor: pointer; }
+    .content { padding: 30px; background-color: #e0e0e0; min-height: calc(100vh - 60px); }
+
+    .seleccionHorario { display: flex; gap: 20px; height: calc(100vh - 120px); }
+    .horario { flex: 2; background: #e0f7ff; border: 2px solid var(--naranja); display: flex; flex-direction: column; }
+    .horario h3 { background: var(--naranja); color: white; padding: 10px; margin: 0; }
+    .horario-body { flex: 1; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; color: #999; }
+    .seleccionados { flex: 1; background: #fff9f0; border: 2px solid var(--amarillo); display: flex; flex-direction: column; }
+    .seleccionados h3 { background: var(--amarillo); padding: 10px; margin: 0; }
+    .seleccionados ul { list-style: none; padding: 10px; margin: 0; flex: 1; overflow-y: auto; }
+    .botones { display: flex; justify-content: space-around; padding: 10px; }
+    .matricular { background: var(--naranja); color: white; border: none; padding: 10px 20px; border-radius: 5px; }
+    .limpiar { background: var(--amarillo); border: none; padding: 10px 20px; border-radius: 5px; }
+
+    .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 999; }
+    .modal-content { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.5); width: 600px; position: relative; }
+    .modal-content h2 { color: var(--marron); font-size: 20px; margin-top: 0; }
+    .modal-content select { width: 100%; padding: 12px; font-size: 14px; margin-top: 15px; }
+    .close, .back-btn { position: absolute; font-size: 24px; font-weight: bold; color: var(--gris); cursor: pointer; }
+    .close { top: 15px; right: 20px; }
+    .back-btn { top: 15px; left: 20px; }
+    .mensaje-exito { color: green; font-weight: bold; margin-top: 20px; text-align: center; }
+    .btn-siguiente { padding: 10px 20px; background: #1a73e8; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff9f0; }
+    table th, table td { padding: 8px; text-align: center; }
+    table thead { background: #ffd700; }
+
+.expansion-card {
+  border: 1px solid var(--amarillo);
+  margin-bottom: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.expansion-header {
+  background-color: var(--amarillo);
+  padding: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.expansion-content {
+  display: none;
+  background: #fff9f0;
+  padding: 10px;
+}
+
+.expansion-card.open .expansion-content {
+  display: block;
+}
+
+.arrow {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.btn-seleccionar {
+  font-size: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: green;
+}
+
+.btn-deseleccionar {
+  font-size: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: red;
+}
+
+.tabla-scroll {
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.tabla-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla-scroll thead th {
+  position: sticky;
+  top: 0;
+  background-color: #ffd700;
+  z-index: 1;
+}
+
+</style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+<div class="sidebar-header-content">
+    <a href="pantallaprinci.html">
+        <img src="leonescologo.png" alt="Logo">
+    </a>
+    <h3>UNIVERSIDAD LEONESCO</h3>
+</div>
+
+    </div>
+  <ul>
+    <li onclick="toggleSubMenu('matriculaSubmenu', 'arrowMatricula')"> Matrículas <span id="arrowMatricula">▼</span></li>
+    <ul class="submenu" id="matriculaSubmenu">
+      <li><a href="simulacionrealnofake.html" style="text-decoration: none; color: inherit;">Simulación de Matrícula</a></li>
+      <li><a href="registrarmatricula.html" style="text-decoration: none; color: inherit;">Registrar Matrícula</a></li>
+      <li><a href="fechasmatricula.html" style="text-decoration: none; color: inherit;">Fechas de mi Matrícula</a></li>
+    </ul>
+      <li onclick="toggleSubMenu('academicoSubmenu', 'arrowAcademico')"> Información Académica <span id="arrowAcademico">▼</span></li>
+      <ul class="submenu" id="academicoSubmenu">
+    <li><a href="consolidadomtr.html" style="text-decoration: none; color: inherit;">Consolidado de Matrícula</a></li>
+    <li><a href="consolidadont.html" style="text-decoration: none; color: inherit;">Consolidado de Notas</a></li>
+    <li><a href="horario.html" style="text-decoration: none; color: inherit;">Mi Horario</a></li>
+    <li><a href="fichaaca.html" style="text-decoration: none; color: inherit;">Ficha Académica</a></li>
+  </ul>
+  <li><a href="infpersonal.html" style="text-decoration: none; color: inherit;">Información Personal</a></li>
+  <li><a href="preguntas.html" style="text-decoration: none; color: inherit;">Preguntas Frecuentes</a></li>
+  <li><a href="pantallainicio.html" style="text-decoration: none; color: inherit;">Salir</a></li>
+</ul>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>Simulación de Matrícula</div>
+      <img src="persona.png" class="avatar" alt="Usuario">
+    </div>
+    <div class="content" id="contenido">
+      <!-- Aquí se cargará el contenido dinámico -->
+    </div>
+  </div>
+
+  <div class="modal" id="modalSeleccion">
+    <div class="modal-content">
+      <div class="back-btn" onclick="window.location.href='pantallaprinci.html'">&#8592;</div>
+      <div class="close" onclick="window.location.href='pantallaprinci.html'">×</div>
+      <h2>Escuela Profesional:</h2>
+      <select id="escuelaSelect" onchange="mostrarConfirmacion()">
+        <option value="">Seleccione su escuela profesional...</option>
+        <option value="1">Ingeniería de Sistemas</option>
+        <option value="2">Administración</option>
+        <option value="3">Ingeniería Civil</option>
+      </select>
+      <div id="confirmacion" style="display: none;">
+        <p class="mensaje-exito">✔ Modo Simulación Activado. Haga click en SIGUIENTE.</p>
+        <button class="btn-siguiente" onclick="mostrarModalCursos()">SIGUIENTE</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modalCursos" style="display: none;">
+    <div class="modal-content">
+      <div class="back-btn" onclick="volverModalAnterior()">&#8592;</div>
+      <div class="close" onclick="window.location.href='pantallaprinci.html'">×</div>
+      <h2>Marque los cursos:</h2>
+      
+      <div class="tabla-scroll">
+        <table>
+          <thead>
+            <tr><th></th><th>Curso</th><th>Vez</th><th>C.Teo</th><th>C.Pra</th><th>Sem.</th></tr>
+          </thead>
+          <tbody id="tablaCursosBody"></tbody>
+        </table>
+      </div>
+
+      <div style="margin-top: 15px;">Nro. Cursos: <span id="totalCursos" style="color: #1a73e8;">0</span> - Créditos: <span id="totalCreditos" style="color: #1a73e8;">0</span></div>
+      <p>Click en CONTINUAR para seleccionar horarios.</p>
+      <button class="btn-siguiente" onclick="mostrarSeleccionHorario()">CONTINUAR</button>
+    </div>
+  </div>
+  </div>
+  <script>
+    function toggleSubMenu(submenuId, arrowId) {
+      const submenu = document.getElementById(submenuId);
+      const arrow = document.getElementById(arrowId);
+      submenu.style.display = submenu.style.display === "block" ? "none" : "block";
+      arrow.textContent = submenu.style.display === "block" ? "▲" : "▼";
+    }
+
+    function mostrarConfirmacion() {
+      const select = document.getElementById('escuelaSelect');
+      document.getElementById('confirmacion').style.display = select.value !== "" ? "block" : "none";
+    }
+
+    function mostrarModalCursos() {
+      document.getElementById("modalSeleccion").style.display = "none";
+      document.getElementById("modalCursos").style.display = "flex";
+    }
+
+    function volverModalAnterior() {
+      document.getElementById("modalCursos").style.display = "none";
+      document.getElementById("modalSeleccion").style.display = "flex";
+    }
+
+    let cursosSeleccionados = [];
+    let totalCreditos = 0;
+
+    function togglePanel(header) {
+      const card = header.parentElement;
+      card.classList.toggle("open");
+      const arrow = header.querySelector(".arrow");
+      arrow.textContent = card.classList.contains("open") ? "▲" : "▼";
+    }
+
+    function seleccionarHorario(btn) {
+      const fila = btn.closest("tr");
+      const panel = btn.closest(".panel");
+      const filas = panel.querySelectorAll("tbody tr");
+
+      if (btn.classList.contains("btn-deseleccionar")) {
+        filas.forEach(f => {
+          f.style.display = "";
+          const b = f.querySelector("button");
+          b.className = "btn-seleccionar";
+          b.innerHTML = "✔";
+          b.style.color = "green";
+        });
+      } else {
+        filas.forEach(f => f.style.display = "none");
+        fila.style.display = "";
+        btn.className = "btn-deseleccionar";
+        btn.innerHTML = "✖";
+        btn.style.color = "red";
+      }
+    }
+
+    function actualizarContador(checkbox) {
+      const fila = checkbox.closest("tr");
+      const nombre = fila.children[1].textContent;
+      const creditos = parseInt(checkbox.dataset.creditos);
+      const id = checkbox.value;
+
+      if (checkbox.checked) {
+        if (totalCreditos + creditos > 26) {
+          alert("No puedes seleccionar más de 26 créditos.");
+          checkbox.checked = false;
+          return;
+        }
+
+        cursosSeleccionados.push({
+          idAsignatura: id,
+          nombre: nombre,
+          creditos: creditos
+        });
+        totalCreditos += creditos;
+      } else {
+        cursosSeleccionados = cursosSeleccionados.filter(c => c.idAsignatura !== id);
+        totalCreditos -= creditos;
+      }
+
+      document.getElementById("totalCursos").textContent = cursosSeleccionados.length;
+      document.getElementById("totalCreditos").textContent = totalCreditos;
+    }
+
+    async function mostrarSeleccionHorario() {
+      document.getElementById("modalCursos").style.display = "none";
+      const contenido = document.getElementById("contenido");
+
+      let html = `<div class='seleccionHorario'>
+        <div class='horario'>
+          <h3>Vista Previa Horario</h3>
+          <div class='horario-body'>(Calendario)</div>
+        </div>
+        <div class='seleccionados'>
+          <h3>Cursos Seleccionados</h3>
+          <ul>`;
+
+      for (const curso of cursosSeleccionados) {
+        const idAsignatura = curso.idAsignatura;
+        const nombreCurso = curso.nombre;
+
+        try {
+          const res = await fetch(`/api/simulacion/horarios/${idAsignatura}`);
+          const data = await res.json();
+
+          if (data.length > 0) {
+            const teoria = data.filter(d => d.grupo === null);
+            if (teoria.length > 0) {
+              html += generarBloqueHorario(`${nombreCurso} (Teoría)`, teoria);
+            }
+
+            const practica = data.filter(d => d.seccion === null);
+            if (practica.length > 0) {
+              html += generarBloqueHorario(`${nombreCurso} (Práctica)`, practica, true);
+            }
+          }
+        } catch (err) {
+          console.error(`Error al obtener horarios para ${nombreCurso}`, err);
+        }
+      }
+
+      html += `</ul>
+          <div class='botones'>
+            <button class='matricular'>MATRICULARSE</button>
+            <button class='limpiar' onclick='window.location.reload()'>LIMPIAR</button>
+          </div>
+        </div>
+      </div>`;
+
+      contenido.innerHTML = html;
+    }
+
+
+    function generarBloqueHorario(titulo, bloques, esPractica = false) {
+      let color = esPractica ? "#e6ffe6" : "#fff9f0";
+
+      let html = `
+        <div class="expansion-card" style="background-color:${color}">
+          <div class="expansion-header" onclick="togglePanel(this)">
+            ${titulo} <span class="arrow">▼</span>
+          </div>
+          <div class="expansion-content">
+            <table>
+              <thead><tr><th>Seleccionar</th><th>Nro.Mat</th><th>Gr/Sec</th><th>Horario</th><th>Docente</th><th>Aula</th></tr></thead>
+              <tbody>
+      `;
+
+      for (const b of bloques) {
+        const grupoSeccion = esPractica ? b.grupo : b.seccion;
+        const cupoMax = esPractica ? "12/20" : "60/65";
+        html += `
+          <tr>
+            <td><button class="btn-seleccionar" onclick="seleccionarHorario(this)">✔</button></td>
+            <td>${cupoMax}</td>
+            <td>${grupoSeccion || "-"}</td>
+            <td>${b.horario}</td>
+            <td>${b.docente}</td>
+            <td>${b.aula}</td>
+          </tr>
+        `;
+      }
+
+      html += `
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      return html;
+    }
+
+    // NUEVAS FUNCIONES AGREGADAS
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.location.pathname.includes("simulacionrealnofake.html")) {
+        const selectEscuela = document.getElementById("escuelaSelect");
+        selectEscuela.addEventListener("change", async () => {
+          const idCarrera = selectEscuela.value;
+          if (idCarrera) {
+            await cargarCursos(idCarrera);
+          }
+        });
+      }
+    });
+
+    async function cargarCursos(idCarrera) {
+      try {
+        const response = await fetch(`/api/simulacion/cursos/${idCarrera}`);
+        const cursos = await response.json();
+
+        const tbody = document.getElementById("tablaCursosBody");
+        tbody.innerHTML = "";
+
+        cursos.forEach(curso => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><input type="checkbox" value="${curso.idAsignatura}" data-creditos="${curso.creditos}" onchange="actualizarContador(this)"></td>
+            <td>${curso.nombre}</td>
+            <td>1</td>
+            <td>${curso.horasTeoricas}</td>
+            <td>${curso.horasPracticas}</td>
+            <td>${curso.semestre}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (error) {
+        console.error("Error al cargar cursos:", error);
+      }
+    }
+
+    function actualizarContador(checkbox) {
+      const nombre = checkbox.closest("tr").children[1].textContent;
+      const creditos = parseInt(checkbox.dataset.creditos);
+      const id = checkbox.value;
+
+      if (checkbox.checked) {
+        if (totalCreditos + creditos > 26) {
+          alert("No puedes seleccionar más de 26 créditos.");
+          checkbox.checked = false;
+          return;
+        }
+
+        cursosSeleccionados.push({
+          idAsignatura: id,
+          nombre: nombre,
+          creditos: creditos
+        });
+        totalCreditos += creditos;
+      } else {
+        cursosSeleccionados = cursosSeleccionados.filter(curso => curso.idAsignatura !== id);
+        totalCreditos -= creditos;
+      }
+
+      document.getElementById("totalCursos").textContent = cursosSeleccionados.length;
+      document.getElementById("totalCreditos").textContent = totalCreditos;
+    }
+  </script>
+</body>
+</html>
